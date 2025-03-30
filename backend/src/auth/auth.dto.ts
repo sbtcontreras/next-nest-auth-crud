@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export type JwtUserPayload = {
+export type JWTPayload = {
   id: string;
   email: string;
   name: string;

@@ -6,9 +6,7 @@ export const PostSchema = z.object({
 });
 
 export const CreatePostSchema = PostSchema;
-export const UpdatePostSchema = PostSchema.extend({
-  id: z.string(),
-}).partial();
+export const UpdatePostSchema = PostSchema.partial();
 
 export type CreatePostDto = z.infer<typeof CreatePostSchema>;
 export type UpdatePostDto = z.infer<typeof UpdatePostSchema>;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto, UpdatePostDto } from './posts.dto';
 import { PrismaService } from 'src/prisma.service';
 
@@ -6,33 +6,55 @@ import { PrismaService } from 'src/prisma.service';
 export class PostsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createPostDto: CreatePostDto, userId: string) {
+  async create(createPostDto: CreatePostDto, userId: string) {
     return this.prisma.post.create({
       data: { ...createPostDto, userId },
     });
   }
 
-  findAll(userId: string) {
+  async findAll(userId: string) {
     return this.prisma.post.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  findOne(id: string, userId: string) {
-    return this.prisma.post.findUnique({
+  async findOne(id: string, userId: string) {
+    const post = await this.prisma.post.findUnique({
       where: { id, userId },
     });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return post;
   }
 
-  update(id: string, updatePostDto: UpdatePostDto, userId: string) {
+  async update(id: string, updatePostDto: UpdatePostDto, userId: string) {
+    const post = await this.prisma.post.findUnique({
+      where: { id, userId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
     return this.prisma.post.update({
       where: { id, userId },
-      data: { ...updatePostDto },
+      data: updatePostDto,
     });
   }
 
-  remove(id: string, userId: string) {
+  async remove(id: string, userId: string) {
+    const post = await this.prisma.post.findUnique({
+      where: { id, userId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
     return this.prisma.post.delete({
       where: { id, userId },
     });

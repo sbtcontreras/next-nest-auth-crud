@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { JwtUserPayload, LoginDto, RegisterDto } from './auth.dto';
+import { JWTPayload, LoginDto, RegisterDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,33 +11,36 @@ export class AuthService {
   ) {}
 
   async login({ email, password }: LoginDto) {
-    const user = await this.usersService.findByEmail(email);
+    try {
+      const user = await this.usersService.findByEmail(email);
+      if (user.password !== password) throw new UnauthorizedException();
 
-    if (user?.password !== password) {
+      const payload: JWTPayload = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      };
+
+      return this.generateAuthData(payload);
+    } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
-    const authData = await this.generateAuthData({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    });
-    return authData;
   }
 
   async register(data: RegisterDto) {
     const user = await this.usersService.create(data);
-    const authData = await this.generateAuthData({
+
+    const payload: JWTPayload = {
       id: user.id,
       email: user.email,
       name: user.name,
-    });
-    return authData;
+    };
+
+    return this.generateAuthData(payload);
   }
 
-  private async generateAuthData(payload: JwtUserPayload) {
+  private async generateAuthData(payload: JWTPayload) {
     const token = await this.jwtService.signAsync(payload);
-
     return {
       user: payload,
       token,
