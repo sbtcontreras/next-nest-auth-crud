@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export type JwtUserPayload = {
+  id: string;
+  email: string;
+  name: string;
+};
+
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { LoginDto, RegisterDto } from './auth.dto';
+import { JwtUserPayload, LoginDto, RegisterDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,29 +17,25 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = {
+    const authData = await this.generateAuthData({
       id: user.id,
       email: user.email,
       name: user.name,
-    };
-
-    const token = await this.jwtService.signAsync(payload);
-
-    return {
-      user: payload,
-      token,
-    };
+    });
+    return authData;
   }
 
   async register(data: RegisterDto) {
     const user = await this.usersService.create(data);
-
-    const payload = {
+    const authData = await this.generateAuthData({
       id: user.id,
       email: user.email,
       name: user.name,
-    };
+    });
+    return authData;
+  }
 
+  private async generateAuthData(payload: JwtUserPayload) {
     const token = await this.jwtService.signAsync(payload);
 
     return {

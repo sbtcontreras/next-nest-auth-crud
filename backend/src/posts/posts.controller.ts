@@ -16,6 +16,7 @@ import {
 } from './posts.dto';
 import { User } from 'src/users/users.decorator';
 import { ZodValidationPipe } from 'src/zod.pipe';
+import { JwtUserPayload } from 'src/auth/auth.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -24,18 +25,18 @@ export class PostsController {
   @Post()
   create(
     @Body(new ZodValidationPipe(CreatePostSchema)) createPostDto: CreatePostDto,
-    @User() user: { id: string },
+    @User() user: JwtUserPayload,
   ) {
     return this.postsService.create(createPostDto, user.id);
   }
 
   @Get()
-  findAll(@User() user: { id: string }) {
+  findAll(@User() user: JwtUserPayload) {
     return this.postsService.findAll(user.id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @User() user: { id: string }) {
+  findOne(@Param('id') id: string, @User() user: JwtUserPayload) {
     return this.postsService.findOne(id, user.id);
   }
 
@@ -43,13 +44,13 @@ export class PostsController {
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdatePostSchema)) updatePostDto: UpdatePostDto,
-    @User() user: { id: string },
+    @User() user: JwtUserPayload,
   ) {
     return this.postsService.update(id, updatePostDto, user.id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @User() user: { id: string }) {
+  remove(@Param('id') id: string, @User() user: JwtUserPayload) {
     return this.postsService.remove(id, user.id);
   }
 }

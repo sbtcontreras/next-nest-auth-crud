@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './auth.decorator';
+import { JwtUserPayload } from './auth.dto';
 
 // This guard checks if the request has a valid JWT token in the Authorization header
 @Injectable()
@@ -34,7 +35,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token); // throw if invalid, so no need to check
+      const payload = await this.jwtService.verifyAsync<JwtUserPayload>(token); // throw if invalid, so no need to check
       request.user = payload;
     } catch {
       throw new UnauthorizedException();
