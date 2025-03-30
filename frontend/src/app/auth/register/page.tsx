@@ -50,8 +50,14 @@ export default function SignUpPage() {
       toast.success("Registro exitoso");
       router.push("/");
     } catch (error) {
+      if (error instanceof Error) {
+        toast.error("Error al registrarse", {
+          description: error.message,
+        });
+        return;
+      }
       toast.error("Error al registrarse", {
-        description: "Por favor verifica tus datos e intenta nuevamente.",
+        description: "Ocurrió un error inesperado",
       });
     }
   }

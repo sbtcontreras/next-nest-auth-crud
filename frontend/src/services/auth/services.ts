@@ -49,8 +49,9 @@ export const login = async (credentials: LoginDTO): Promise<void> => {
     });
     storeAuthData(authData);
   } catch (error) {
-    console.error("Login failed:", error);
-    throw new Error("Login failed");
+    const errorMessage =
+      error instanceof Error ? error.message : "Login failed";
+    throw new Error(errorMessage);
   }
 };
 
@@ -62,8 +63,9 @@ export const register = async (credentials: RegisterDTO): Promise<void> => {
     });
     storeAuthData(authData);
   } catch (error) {
-    console.error("Registration failed:", error);
-    throw new Error("Registration failed");
+    const errorMessage =
+      error instanceof Error ? error.message : "Registration failed";
+    throw new Error(errorMessage);
   }
 };
 
