@@ -4,7 +4,7 @@ import type { z } from "zod";
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Loader2, Pencil } from "lucide-react";
+import { Edit2, Loader2 } from "lucide-react";
 import { create } from "zustand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { UpdatePostSchema as formSchema } from "@/services/posts/schemas";
+import { updatePostSchema as formSchema } from "@/services/posts/schemas";
 import { useUpdatePost } from "@/services/posts/hooks";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -32,7 +32,7 @@ type DefaultValues = Partial<z.infer<typeof formSchema>>;
 interface ModalState {
   open: boolean;
   defaultValues: DefaultValues;
-  openModal: (values?: DefaultValues) => void;
+  openModal: (values: DefaultValues) => void;
   closeModal: () => void;
 }
 
@@ -109,12 +109,12 @@ export function UpdatePostModal() {
               {f.formState.isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 animate-spin" />
-                  Actualizando...
+                  Editando...
                 </>
               ) : (
                 <>
-                  <Pencil className="mr-2" />
-                  Actualizar
+                  <Edit2 className="mr-2" />
+                  Editar
                 </>
               )}
             </Button>

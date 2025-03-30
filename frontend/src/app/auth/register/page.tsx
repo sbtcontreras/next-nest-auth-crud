@@ -50,7 +50,6 @@ export default function SignUpPage() {
       toast.success("Registro exitoso");
       router.push("/");
     } catch (error) {
-      console.error("Error en el registro", error);
       toast.error("Error al registrarse", {
         description: "Por favor verifica tus datos e intenta nuevamente.",
       });

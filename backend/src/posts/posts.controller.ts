@@ -10,9 +10,9 @@ import {
 import { PostsService } from './posts.service';
 import {
   CreatePostDto,
-  CreatePostSchema,
+  createPostSchema,
   UpdatePostDto,
-  UpdatePostSchema,
+  updatePostSchema,
 } from './posts.dto';
 import { User } from 'src/users/users.decorator';
 import { ZodValidationPipe } from 'src/zod.pipe';
@@ -24,7 +24,7 @@ export class PostsController {
 
   @Post()
   create(
-    @Body(new ZodValidationPipe(CreatePostSchema)) createPostDto: CreatePostDto,
+    @Body(new ZodValidationPipe(createPostSchema)) createPostDto: CreatePostDto,
     @User() user: JWTPayload,
   ) {
     return this.postsService.create(createPostDto, user.id);
@@ -43,7 +43,7 @@ export class PostsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(UpdatePostSchema)) updatePostDto: UpdatePostDto,
+    @Body(new ZodValidationPipe(updatePostSchema)) updatePostDto: UpdatePostDto,
     @User() user: JWTPayload,
   ) {
     return this.postsService.update(id, updatePostDto, user.id);

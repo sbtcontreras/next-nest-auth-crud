@@ -96,7 +96,6 @@ export default function Page() {
         return;
       }
 
-      console.error("Error de inicio de sesión", error);
       toast.error("Credenciales inválidas", {
         description: `Intentos restantes: ${MAX_ATTEMPTS - newAttempts}`,
       });

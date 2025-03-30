@@ -16,7 +16,7 @@ import {
 import { Loader2, Trash2 } from "lucide-react";
 import { create } from "zustand";
 import { useDeletePost } from "@/services/posts/hooks";
-import { DeletePostSchema as formSchema } from "@/services/posts/schemas";
+import { deletePostSchema as formSchema } from "@/services/posts/schemas";
 
 type DefaultValues = Partial<z.infer<typeof formSchema>>;
 interface ModalState {

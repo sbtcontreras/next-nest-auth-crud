@@ -3,16 +3,8 @@ import { apiClient } from "../api";
 import { toast } from "sonner";
 import { useCreatePostModal } from "@/app/_components/CreatePost";
 import { useUpdatePostModal } from "@/app/_components/UpdatePost";
-import { CreatePostDto, UpdatePostDto } from "./schemas";
+import { CreatePostDto, Post, UpdatePostDto } from "./schemas";
 import { useDeletePostModal } from "@/app/_components/DeletePost";
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export function usePosts() {
   return useQuery({
@@ -33,6 +25,9 @@ export function useCreatePost() {
       toast.success("Post creado con éxito");
       closeModal();
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 }
 
@@ -52,6 +47,9 @@ export function useUpdatePost() {
       toast.success("Post actualizado con éxito");
       closeModal();
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 }
 
@@ -66,6 +64,9 @@ export function useDeletePost() {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post eliminado con éxito");
       closeModal();
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 }

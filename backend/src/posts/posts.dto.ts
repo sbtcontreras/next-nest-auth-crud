@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-export const PostSchema = z.object({
+const postSchema = z.object({
   title: z.string(),
   content: z.string(),
 });
 
-export const CreatePostSchema = PostSchema;
-export const UpdatePostSchema = PostSchema.partial();
+export const createPostSchema = postSchema;
+export const updatePostSchema = postSchema.partial();
 
-export type CreatePostDto = z.infer<typeof CreatePostSchema>;
-export type UpdatePostDto = z.infer<typeof UpdatePostSchema>;
+export type CreatePostDto = z.infer<typeof createPostSchema>;
+export type UpdatePostDto = z.infer<typeof updatePostSchema>;

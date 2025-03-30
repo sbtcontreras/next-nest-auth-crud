@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CreatePostSchema as formSchema } from "@/services/posts/schemas";
+import { createPostSchema as formSchema } from "@/services/posts/schemas";
 import { useCreatePost } from "@/services/posts/hooks";
 import { Textarea } from "@/components/ui/textarea";
 
