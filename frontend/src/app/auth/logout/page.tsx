@@ -13,9 +13,9 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { logout } from "@/services/auth/services";
 import { useAuth } from "@/services/auth/hooks";
-import { useEffect } from "react";
 import Link from "next/link";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,9 +23,7 @@ export default function Page() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      router.push("/auth/login");
-    }
+    if (!isAuthenticated && !isLoading) router.push("/auth/login");
   }, [isAuthenticated, isLoading, router]);
 
   async function onSubmit() {

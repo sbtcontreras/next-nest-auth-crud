@@ -2,7 +2,6 @@
 
 import { useAuth } from "@/services/auth/hooks";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus } from "lucide-react";
 import {
@@ -15,18 +14,17 @@ import {
 import { CreatePostModal, useCreatePostModal } from "./_components/CreatePost";
 import { Posts } from "./_components/Posts";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Page() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
-  const { openModal: launchCreatePost } = useCreatePostModal();
-
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      router.push("/auth/login");
-    }
+    if (!isAuthenticated && !isLoading) router.push("/auth/login");
   }, [isAuthenticated, isLoading, router]);
+
+  const { openModal: launchCreatePost } = useCreatePostModal();
 
   return (
     <>

@@ -55,7 +55,7 @@ cp example.env .env
 4. Run database migrations:
 
 ```bash
-pnpm db push
+pnpm prisma db push
 ```
 
 5. Start dev server:

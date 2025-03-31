@@ -1,10 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Loader2, LogIn } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { loginSchema } from "@/services/auth/schemas";
+import { login } from "@/services/auth/services";
+import { useAuth } from "@/services/auth/hooks";
+import type { z } from "zod";
 import {
   Form,
   FormControl,
@@ -20,62 +26,33 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, LogIn } from "lucide-react";
-import { useState, useEffect } from "react";
-import { loginSchema } from "@/services/auth/schemas";
-import { useRouter } from "next/navigation";
-import { login } from "@/services/auth/services";
-import { useAuth } from "@/services/auth/hooks";
-import type { z } from "zod";
-import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const MAX_ATTEMPTS = 3;
-const LOCK_TIME = 20 * 1000;
+const LOCK_TIME_SECONDS = 20;
 
-export default function Page() {
+export default function LoginPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-
   const [attempts, setAttempts] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
   const [lockTimeLeft, setLockTimeLeft] = useState(0);
+  const isLocked = attempts >= MAX_ATTEMPTS;
+
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) router.push("/");
+  }, [isAuthenticated, isLoading, router]);
 
   const f = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
 
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      router.push("/");
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  useEffect(() => {
-    if (!isLocked) return;
-
-    const endTime = Date.now() + LOCK_TIME;
-
-    const timer = setInterval(() => {
-      const remaining = Math.ceil((endTime - Date.now()) / 1000);
-      if (remaining <= 0) {
-        clearInterval(timer);
-        setIsLocked(false);
-        setAttempts(0);
-        setLockTimeLeft(0);
-        return;
-      }
-      setLockTimeLeft(remaining);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [isLocked]);
-
-  async function onSubmit(data: z.infer<typeof loginSchema>) {
+  const handleSubmit = async (data: z.infer<typeof loginSchema>) => {
     if (isLocked) {
-      toast.error(
-        `Espera ${lockTimeLeft} segundos antes de intentar nuevamente.`
-      );
+      toast.error("Demasiados intentos fallidos.", {
+        description: `Intenta nuevamente en ${lockTimeLeft} segundos.`,
+      });
       return;
     }
 
@@ -88,11 +65,21 @@ export default function Page() {
       setAttempts(newAttempts);
 
       if (newAttempts >= MAX_ATTEMPTS) {
-        setIsLocked(true);
-        setLockTimeLeft(Math.floor(LOCK_TIME / 1000));
         toast.error("Demasiados intentos fallidos.", {
-          description: `Intenta nuevamente en ${LOCK_TIME / 1000} segundos.`,
+          description: `Intenta nuevamente en ${LOCK_TIME_SECONDS} segundos.`,
         });
+
+        setLockTimeLeft(LOCK_TIME_SECONDS);
+        const timer = setInterval(() => {
+          setLockTimeLeft((prev) => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              setAttempts(0);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
         return;
       }
 
@@ -100,7 +87,7 @@ export default function Page() {
         description: `Intentos restantes: ${MAX_ATTEMPTS - newAttempts}`,
       });
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-lg rounded-none md:rounded-xl">
@@ -112,7 +99,7 @@ export default function Page() {
       </CardHeader>
       <CardContent>
         <Form {...f}>
-          <form onSubmit={f.handleSubmit(onSubmit)} className="grid gap-4">
+          <form onSubmit={f.handleSubmit(handleSubmit)} className="grid gap-4">
             <FormField
               control={f.control}
               name="email"
@@ -137,7 +124,7 @@ export default function Page() {
                 <FormItem>
                   <FormLabel>Contraseña</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="********" type="password" />
+                    <Input {...field} type="password" placeholder="********" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

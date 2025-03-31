@@ -33,16 +33,14 @@ export default function SignUpPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) router.push("/");
+  }, [isAuthenticated, isLoading, router]);
+
   const f = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: "", email: "", password: "" },
   });
-
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      router.push("/");
-    }
-  }, [isAuthenticated, isLoading, router]);
 
   async function onSubmit(data: z.infer<typeof registerSchema>) {
     try {
