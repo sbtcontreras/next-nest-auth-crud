@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "../api";
+import { apiClient } from "../api/client";
 import { toast } from "sonner";
 import { useCreatePostModal } from "@/app/_components/CreatePost";
 import { useUpdatePostModal } from "@/app/_components/UpdatePost";
-import { CreatePostDto, Post, UpdatePostDto } from "./schemas";
+import { CreatePostDTO, Post, UpdatePostDTO } from "./dto";
 import { useDeletePostModal } from "@/app/_components/DeletePost";
 
 export function usePosts() {
@@ -18,7 +18,7 @@ export function useCreatePost() {
   const { closeModal } = useCreatePostModal.getState();
 
   return useMutation({
-    mutationFn: (newPost: CreatePostDto) =>
+    mutationFn: (newPost: CreatePostDTO) =>
       apiClient("/posts", { method: "POST", body: JSON.stringify(newPost) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -35,9 +35,14 @@ export function useUpdatePost() {
   const queryClient = useQueryClient();
   const { closeModal } = useUpdatePostModal.getState();
 
+  type MutationParams = {
+    id?: string;
+    updatedPost: UpdatePostDTO;
+  };
+
   return useMutation({
-    mutationFn: (updatedPost: UpdatePostDto) =>
-      apiClient(`/posts/${updatedPost.id}`, {
+    mutationFn: ({ id, updatedPost }: MutationParams) =>
+      apiClient(`/posts/${id}`, {
         method: "PATCH",
         body: JSON.stringify(updatedPost),
       }),
@@ -57,8 +62,12 @@ export function useDeletePost() {
   const queryClient = useQueryClient();
   const { closeModal } = useDeletePostModal.getState();
 
+  type MutationParams = {
+    id?: string;
+  };
+
   return useMutation({
-    mutationFn: ({ id }: { id: string }) =>
+    mutationFn: ({ id }: MutationParams) =>
       apiClient(`/posts/${id}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });

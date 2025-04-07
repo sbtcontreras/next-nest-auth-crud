@@ -1,74 +1,76 @@
-import { apiClient } from "../api";
-import { AuthData, LoginDTO, RegisterDTO, User } from "./schemas";
+import { apiClient } from "../api/client";
+import { AuthData, LoginDTO, RegisterDTO } from "./dto";
 
+// Constants
 const AUTH_STORAGE_KEY = "auth";
 
-const isTokenValid = (token: string): boolean => {
+// Token utilities
+const decodeTokenPayload = (token: string) => {
   const payload = token.split(".")[1];
-  if (!payload) return false;
-  const decodedPayload = JSON.parse(atob(payload));
-  const exp = decodedPayload.exp;
-  if (!exp) return false;
-  const currentTime = Math.floor(Date.now() / 1000);
-  return exp > currentTime;
+  if (!payload) return null;
+  return JSON.parse(atob(payload));
 };
 
-const storeAuthData = (authData: AuthData): void => {
+const isTokenValid = (token: string) => {
+  try {
+    const decoded = decodeTokenPayload(token);
+    if (!decoded?.exp) return false;
+    return decoded.exp > Math.floor(Date.now() / 1000);
+  } catch {
+    return false;
+  }
+};
+
+// Storage utilities
+const storeAuthData = (authData: AuthData) => {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
 };
 
-const clearAuthData = (): void => {
+const clearAuthData = () => {
   localStorage.removeItem(AUTH_STORAGE_KEY);
 };
 
-const retrieveAuthData = (): AuthData | null => {
+const retrieveAuthData = () => {
   if (typeof window === "undefined") return null;
-  const data = localStorage.getItem(AUTH_STORAGE_KEY);
-  if (!data) return null;
-  const parsedData = JSON.parse(data) as AuthData;
-  if (!isTokenValid(parsedData.token)) {
-    clearAuthData();
+
+  try {
+    const data = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!data) return null;
+
+    const parsedData = JSON.parse(data) as AuthData;
+    if (!isTokenValid(parsedData.token)) {
+      clearAuthData();
+      return null;
+    }
+    return parsedData;
+  } catch {
     return null;
   }
-  return parsedData;
 };
 
-export const getCurrentToken = (): string | null => {
-  return retrieveAuthData()?.token ?? null;
-};
+// Auth service
+export const authService = {
+  getCurrentToken: () => retrieveAuthData()?.token ?? null,
 
-export const getCurrentUser = (): User | null => {
-  return retrieveAuthData()?.user ?? null;
-};
+  getCurrentUser: () => retrieveAuthData()?.user ?? null,
 
-export const login = async (credentials: LoginDTO): Promise<void> => {
-  try {
+  login: async (credentials: LoginDTO) => {
     const authData = await apiClient<AuthData>("/auth/login", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
     storeAuthData(authData);
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Login failed";
-    throw new Error(errorMessage);
-  }
-};
+  },
 
-export const register = async (credentials: RegisterDTO): Promise<void> => {
-  try {
+  register: async (credentials: RegisterDTO) => {
     const authData = await apiClient<AuthData>("/auth/register", {
       method: "POST",
       body: JSON.stringify(credentials),
     });
     storeAuthData(authData);
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Registration failed";
-    throw new Error(errorMessage);
-  }
-};
+  },
 
-export const logout = (): void => {
-  clearAuthData();
+  logout: () => {
+    clearAuthData();
+  },
 };

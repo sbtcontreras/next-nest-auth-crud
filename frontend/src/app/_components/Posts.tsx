@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit2, Loader2 } from "lucide-react";
 import { DeletePostModal, useDeletePostModal } from "./DeletePost";
@@ -20,7 +19,7 @@ export function Posts() {
 
   if (isLoading) {
     return (
-      <div className="flex w-full items-center justify-center">
+      <div className="flex w-full items-center justify-center h-64">
         <Loader2 className="animate-spin" />
       </div>
     );

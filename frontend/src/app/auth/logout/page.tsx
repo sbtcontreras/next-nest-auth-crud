@@ -10,27 +10,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { logout } from "@/services/auth/services";
-import { useAuth } from "@/services/auth/hooks";
 import Link from "next/link";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useUserMustBeLogged } from "@/services/auth/hooks";
 
 export default function Page() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!isAuthenticated && !isLoading) router.push("/auth/login");
-  }, [isAuthenticated, isLoading, router]);
+  const { logout } = useUserMustBeLogged();
 
   async function onSubmit() {
     logout();
-    queryClient.clear();
     toast.success("Sesión cerrada exitosamente");
-    router.push("/auth/login");
   }
 
   return (

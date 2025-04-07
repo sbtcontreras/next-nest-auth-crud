@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2, LogIn } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { loginSchema } from "@/services/auth/schemas";
-import { login } from "@/services/auth/services";
-import { useAuth } from "@/services/auth/hooks";
+import { loginSchema } from "@/services/auth/dto";
 import type { z } from "zod";
 import {
   Form,
@@ -28,24 +25,21 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUserMustBeLoggedOut } from "@/services/auth/hooks";
 
 const MAX_ATTEMPTS = 3;
 const LOCK_TIME_SECONDS = 20;
 
 export default function LoginPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
+  const { login } = useUserMustBeLoggedOut();
+
   const [attempts, setAttempts] = useState(0);
   const [lockTimeLeft, setLockTimeLeft] = useState(0);
   const isLocked = attempts >= MAX_ATTEMPTS;
 
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) router.push("/");
-  }, [isAuthenticated, isLoading, router]);
-
   const f = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { username: "", password: "" },
   });
 
   const handleSubmit = async (data: z.infer<typeof loginSchema>) => {
@@ -59,7 +53,6 @@ export default function LoginPage() {
     try {
       await login(data);
       toast.success("Inicio de sesión exitoso");
-      router.push("/");
     } catch (error) {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);
@@ -86,6 +79,7 @@ export default function LoginPage() {
       toast.error("Credenciales inválidas", {
         description: `Intentos restantes: ${MAX_ATTEMPTS - newAttempts}`,
       });
+      console.error("Login error:", error);
     }
   };
 
@@ -102,16 +96,12 @@ export default function LoginPage() {
           <form onSubmit={f.handleSubmit(handleSubmit)} className="grid gap-4">
             <FormField
               control={f.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Correo electrónico</FormLabel>
+                  <FormLabel>Nombre de usuario</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="johndoe@mail.com"
-                      type="email"
-                    />
+                    <Input {...field} placeholder="johndoe" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

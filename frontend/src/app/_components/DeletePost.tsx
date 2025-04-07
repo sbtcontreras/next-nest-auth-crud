@@ -1,11 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
 import {
   Dialog,
   DialogContent,
@@ -16,9 +11,9 @@ import {
 import { Loader2, Trash2 } from "lucide-react";
 import { create } from "zustand";
 import { useDeletePost } from "@/services/posts/hooks";
-import { deletePostSchema as formSchema } from "@/services/posts/schemas";
 
-type DefaultValues = Partial<z.infer<typeof formSchema>>;
+type DefaultValues = Partial<{ id: string }>;
+
 interface ModalState {
   open: boolean;
   defaultValues: DefaultValues;
@@ -37,14 +32,6 @@ export function DeletePostModal() {
   const { open, defaultValues, closeModal } = useDeletePostModal();
   const m = useDeletePost();
 
-  const f = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
-
-  useEffect(() => {
-    f.reset(defaultValues);
-  }, [f, open, defaultValues]);
-
   return (
     <Dialog open={open} onOpenChange={closeModal}>
       <DialogContent className="max-h-[80svh] w-full max-w-2xl overflow-y-auto">
@@ -55,31 +42,26 @@ export function DeletePostModal() {
             irreversible.
           </DialogDescription>
         </DialogHeader>
-        <Form {...f}>
-          <form
-            onSubmit={f.handleSubmit((data) => m.mutateAsync(data))}
-            className="grid gap-4 md:grid-cols-2"
+        <div className="grid gap-4 md:grid-cols-2">
+          <Button type="button" variant="secondary" onClick={closeModal}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => m.mutateAsync({ id: defaultValues.id })}
+            variant="destructive"
+            disabled={m.isPending}
           >
-            <Button type="button" variant="secondary" onClick={closeModal}>
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              variant="destructive"
-              disabled={f.formState.isSubmitting}
-            >
-              {f.formState.isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 animate-spin" /> Eliminando...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2" /> Eliminar
-                </>
-              )}
-            </Button>
-          </form>
-        </Form>
+            {m.isPending ? (
+              <>
+                <Loader2 className="mr-2 animate-spin" /> Eliminando...
+              </>
+            ) : (
+              <>
+                <Trash2 className="mr-2" /> Eliminar
+              </>
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

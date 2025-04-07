@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import {
-  CreatePostDto,
+  CreatePostDTO,
   createPostSchema,
-  UpdatePostDto,
+  UpdatePostDTO,
   updatePostSchema,
 } from './posts.dto';
 import { User } from 'src/users/users.decorator';
@@ -24,7 +24,7 @@ export class PostsController {
 
   @Post()
   create(
-    @Body(new ZodValidationPipe(createPostSchema)) createPostDto: CreatePostDto,
+    @Body(new ZodValidationPipe(createPostSchema)) createPostDto: CreatePostDTO,
     @User() user: JWTPayload,
   ) {
     return this.postsService.create(createPostDto, user.id);
@@ -43,7 +43,7 @@ export class PostsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body(new ZodValidationPipe(updatePostSchema)) updatePostDto: UpdatePostDto,
+    @Body(new ZodValidationPipe(updatePostSchema)) updatePostDto: UpdatePostDTO,
     @User() user: JWTPayload,
   ) {
     return this.postsService.update(id, updatePostDto, user.id);

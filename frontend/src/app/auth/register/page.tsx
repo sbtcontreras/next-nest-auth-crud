@@ -21,32 +21,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loader2, UserPlus } from "lucide-react";
-import { registerSchema } from "@/services/auth/schemas";
-import { useRouter } from "next/navigation";
-import { register } from "@/services/auth/services";
-import { useAuth } from "@/services/auth/hooks";
+import { registerSchema } from "@/services/auth/dto";
 import type { z } from "zod";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useUserMustBeLoggedOut } from "@/services/auth/hooks";
 
 export default function SignUpPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isAuthenticated && !isLoading) router.push("/");
-  }, [isAuthenticated, isLoading, router]);
+  const { register } = useUserMustBeLoggedOut();
 
   const f = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { username: "", fullName: "", password: "" },
   });
 
   async function onSubmit(data: z.infer<typeof registerSchema>) {
     try {
       await register(data);
       toast.success("Registro exitoso");
-      router.push("/");
     } catch (error) {
       if (error instanceof Error) {
         toast.error("Error al registrarse", {
@@ -73,12 +64,12 @@ export default function SignUpPage() {
           <form onSubmit={f.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
               control={f.control}
-              name="name"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre completo</FormLabel>
+                  <FormLabel>Nombre de usuario</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="John Doe" />
+                    <Input {...field} placeholder="johndoe" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -86,16 +77,12 @@ export default function SignUpPage() {
             />
             <FormField
               control={f.control}
-              name="email"
+              name="fullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Correo electrónico</FormLabel>
+                  <FormLabel>Nombre completo</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="johndoe@mail.com"
-                      type="email"
-                    />
+                    <Input {...field} placeholder="John Doe" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

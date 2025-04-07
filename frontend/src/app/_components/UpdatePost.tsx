@@ -23,11 +23,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { updatePostSchema as formSchema } from "@/services/posts/schemas";
+import { updatePostSchema as formSchema } from "@/services/posts/dto";
 import { useUpdatePost } from "@/services/posts/hooks";
 import { Textarea } from "@/components/ui/textarea";
 
-type DefaultValues = Partial<z.infer<typeof formSchema>>;
+type DefaultValues = Partial<z.infer<typeof formSchema> & { id: string }>;
 
 interface ModalState {
   open: boolean;
@@ -66,7 +66,9 @@ export function UpdatePostModal() {
         </DialogHeader>
         <Form {...f}>
           <form
-            onSubmit={f.handleSubmit((data) => m.mutateAsync(data))}
+            onSubmit={f.handleSubmit((data) =>
+              m.mutateAsync({ id: defaultValues.id, updatedPost: data })
+            )}
             className="grid gap-4"
           >
             <FormField

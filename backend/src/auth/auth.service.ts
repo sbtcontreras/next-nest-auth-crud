@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import { JWTPayload, LoginDto, RegisterDto } from './auth.dto';
+import { AuthData, JWTPayload, LoginDTO, RegisterDTO } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,15 +10,15 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login({ email, password }: LoginDto) {
+  async login({ username, password }: LoginDTO) {
     try {
-      const user = await this.usersService.findByEmail(email);
+      const user = await this.usersService.findByUsername(username);
       if (user.password !== password) throw new UnauthorizedException();
 
       const payload: JWTPayload = {
         id: user.id,
-        email: user.email,
-        name: user.name,
+        username: user.username,
+        fullName: user.fullName,
       };
 
       return this.generateAuthData(payload);
@@ -27,13 +27,13 @@ export class AuthService {
     }
   }
 
-  async register(data: RegisterDto) {
+  async register(data: RegisterDTO) {
     const user = await this.usersService.create(data);
 
     const payload: JWTPayload = {
       id: user.id,
-      email: user.email,
-      name: user.name,
+      username: user.username,
+      fullName: user.fullName,
     };
 
     return this.generateAuthData(payload);
@@ -41,9 +41,12 @@ export class AuthService {
 
   private async generateAuthData(payload: JWTPayload) {
     const token = await this.jwtService.signAsync(payload);
-    return {
-      user: payload,
+
+    const authData: AuthData = {
       token,
+      user: payload,
     };
+
+    return authData;
   }
 }
