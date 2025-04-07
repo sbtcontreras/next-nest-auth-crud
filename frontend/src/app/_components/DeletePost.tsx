@@ -12,24 +12,22 @@ import { Loader2, Trash2 } from "lucide-react";
 import { create } from "zustand";
 import { useDeletePost } from "@/services/posts/hooks";
 
-type DefaultValues = Partial<{ id: string }>;
-
 interface ModalState {
   open: boolean;
-  defaultValues: DefaultValues;
-  openModal: (values: DefaultValues) => void;
+  id?: string;
+  openModal: (id: string) => void;
   closeModal: () => void;
 }
 
 export const useDeletePostModal = create<ModalState>((set) => ({
   open: false,
-  defaultValues: {},
-  openModal: (values) => set({ open: true, defaultValues: values }),
+  id: undefined,
+  openModal: (id) => set({ open: true, id }),
   closeModal: () => set({ open: false }),
 }));
 
 export function DeletePostModal() {
-  const { open, defaultValues, closeModal } = useDeletePostModal();
+  const { open, id, closeModal } = useDeletePostModal();
   const m = useDeletePost();
 
   return (
@@ -47,7 +45,7 @@ export function DeletePostModal() {
             Cancelar
           </Button>
           <Button
-            onClick={() => m.mutateAsync({ id: defaultValues.id })}
+            onClick={() => m.mutateAsync({ id })}
             variant="destructive"
             disabled={m.isPending}
           >

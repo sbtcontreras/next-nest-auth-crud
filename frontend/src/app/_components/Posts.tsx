@@ -43,7 +43,7 @@ export function Posts() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => launchUpdatePost(post)}
+              onClick={() => launchUpdatePost(post.id, post)}
             >
               <Edit2 className="mr-2 size-4" />
               Editar
@@ -51,7 +51,7 @@ export function Posts() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => launchDeletePost(post)}
+              onClick={() => launchDeletePost(post.id)}
             >
               <Trash2 className="mr-2 size-4" />
               Eliminar

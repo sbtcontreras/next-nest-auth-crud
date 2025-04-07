@@ -27,24 +27,26 @@ import { updatePostSchema as formSchema } from "@/services/posts/dto";
 import { useUpdatePost } from "@/services/posts/hooks";
 import { Textarea } from "@/components/ui/textarea";
 
-type DefaultValues = Partial<z.infer<typeof formSchema> & { id: string }>;
+type DefaultValues = Partial<z.infer<typeof formSchema>>;
 
 interface ModalState {
   open: boolean;
+  id?: string;
   defaultValues: DefaultValues;
-  openModal: (values: DefaultValues) => void;
+  openModal: (id: string, defaultValues: DefaultValues) => void;
   closeModal: () => void;
 }
 
 export const useUpdatePostModal = create<ModalState>((set) => ({
   open: false,
+  id: undefined,
   defaultValues: {},
-  openModal: (values) => set({ open: true, defaultValues: values }),
+  openModal: (id, defaultValues) => set({ open: true, id, defaultValues }),
   closeModal: () => set({ open: false }),
 }));
 
 export function UpdatePostModal() {
-  const { open, defaultValues, closeModal } = useUpdatePostModal();
+  const { open, id, defaultValues, closeModal } = useUpdatePostModal();
   const m = useUpdatePost();
 
   const f = useForm<z.infer<typeof formSchema>>({
@@ -66,8 +68,8 @@ export function UpdatePostModal() {
         </DialogHeader>
         <Form {...f}>
           <form
-            onSubmit={f.handleSubmit((data) =>
-              m.mutateAsync({ id: defaultValues.id, updatedPost: data })
+            onSubmit={f.handleSubmit((updatedPost) =>
+              m.mutateAsync({ id, updatedPost })
             )}
             className="grid gap-4"
           >
