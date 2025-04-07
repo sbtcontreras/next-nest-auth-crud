@@ -3,7 +3,7 @@ import { z } from 'zod';
 export type JWTPayload = {
   id: string;
   username: string;
-  fullName: string;
+  fullname: string;
 };
 
 export const loginSchema = z.object({
@@ -12,7 +12,7 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  fullName: z.string().trim().nonempty('El nombre completo es requerido'),
+  fullname: z.string().trim().nonempty('El nombre completo es requerido'),
   username: z
     .string()
     .trim()

@@ -18,12 +18,12 @@ export class AuthService {
       const payload: JWTPayload = {
         id: user.id,
         username: user.username,
-        fullName: user.fullName,
+        fullname: user.fullname,
       };
 
       return this.generateAuthData(payload);
     } catch (error) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciales inválidas');
     }
   }
 
@@ -33,7 +33,7 @@ export class AuthService {
     const payload: JWTPayload = {
       id: user.id,
       username: user.username,
-      fullName: user.fullName,
+      fullname: user.fullname,
     };
 
     return this.generateAuthData(payload);

@@ -31,7 +31,7 @@ export default function SignUpPage() {
 
   const f = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { username: "", fullName: "", password: "" },
+    defaultValues: { username: "", fullname: "", password: "" },
   });
 
   async function onSubmit(data: z.infer<typeof registerSchema>) {
@@ -77,7 +77,7 @@ export default function SignUpPage() {
             />
             <FormField
               control={f.control}
-              name="fullName"
+              name="fullname"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nombre completo</FormLabel>
